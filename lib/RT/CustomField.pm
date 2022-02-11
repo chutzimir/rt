@@ -2385,6 +2385,10 @@ sub CleanupDefaultValues {
     }
 }
 
+sub IsNumeric {
+    my $self = shift;
+}
+
 =head2 id
 
 Returns the current value of id. 
