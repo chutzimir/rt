@@ -291,6 +291,7 @@
   <div class="form-row">
     <div class="col-12">
 % if ($SubscriptionObj) {
+      <& /Elements/Submit, Name => 'SendTestEmail', Label => loc('Send Test Email') &>
       <& /Elements/Submit, Name => "Save", Label => loc('Save Changes') &>
 % } else {
       <& /Elements/Submit, Name => "Save", Label => loc('Subscribe') &>
@@ -463,6 +464,15 @@ if (defined $ARGS{Save}) {
     $UserString = undef;
     $UserField = undef;
     $UserOp = undef;
+} elsif ( $ARGS{SendTestEmail} ) {
+    if ($SubscriptionObj) {
+        require RT::Dashboard::Mailer;
+        RT::Dashboard::Mailer->MailDashboards(
+            Subscription => $SubscriptionObj,
+            Test         => 1,
+        );
+        push @results, loc("Sent test email");
+    }
 }
 
 if ($SubscriptionObj) {
