@@ -374,7 +374,25 @@ function ReplaceAllTextareas() {
             // Set the type
             type.val("text/html");
 
-            CKEDITOR.replace(textArea.name,{ width: '100%', height: RT.Config.MessageBoxRichTextHeight });
+            if (jQuery(textArea).hasClass("messagebox")) {
+                // * the "messagebox" class is used for ticket correspondence/comment content.
+                // * for a long time this was the only use of the CKEDITOR and it was given its own
+                //   user/system configuration option.
+                // * continue using this config option for those CKEDITOR instances
+                CKEDITOR.replace(textArea.name,{ width: '100%', height: RT.Config.MessageBoxRichTextHeight });
+            }
+            else {
+                // * for all CKEDITOR instances without the "messagebox" class we instead base the
+                //   (editable) height on the size of the textarea element it's replacing.
+                //   (the height does not include any toolbars, the status bar, or other "overhead")
+                // * the number 54 is chosen somewhat arbitrarily.  it will not scale well for textareas
+                //   with different number of rows
+                // * in at least one browser/styling:
+                //   * there's 42px more top/bottom margin in the CKEditor than there is in the textarea
+                //   * the gap between lines is 3px taller in the CKEditor than it is in the textarea
+                //   + each new paragraph in the CKEditor adds an additional 13px to the gap between lines
+                CKEDITOR.replace(textArea.name,{ width: '100%', height: (jQuery(textArea).height() + 54) + 'px' });
+            }
 
             jQuery('[name="' + textArea.name + '___Frame"]').addClass("richtext-editor");
         }
