@@ -221,10 +221,20 @@ L<HTML::Scrubber/scrub>.
 sub scrub {
     my $self = shift;
     my $Content = shift // '';
+    my $skip_structure_check = shift // 0;
 
-    # First pass through HTML::Gumbo to balance the tags
-    eval { $Content = $self->gumbo->parse( $Content ); chomp $Content };
-    warn "HTML::Gumbo pre-parse failed: $@" if $@;
+    # Some strings come from trusted sources so that we can be sure that they
+    # don't contain the types of tags that need to be checked for being
+    # balanced.  Further, some of these strings (specifically format strings
+    # for table output) may contain "unnecessary" HTML entities, such as &#39;,
+    # that need to remain as-is for other reasons, but HTML::Gumbo converts
+    # them to their "normal" form, such as '.  This can cause display errors,
+    # so we have an option to skip the check with HTML::Gumbo.
+    unless ( $skip_structure_check ) {
+        # First pass through HTML::Gumbo to balance the tags
+        eval { $Content = $self->gumbo->parse( $Content ); chomp $Content };
+        warn "HTML::Gumbo pre-parse failed: $@" if $@;
+    }
 
     return $self->SUPER::scrub($Content);
 }
